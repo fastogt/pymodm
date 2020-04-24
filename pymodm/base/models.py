@@ -359,8 +359,11 @@ class MongoModelBase(object):
                 field_value = field.value_from_object(self)
                 field_empty = field.is_undefined(self)
                 if field_empty and field.required:
-                    error_dict[field.attname] = [ValidationError(
-                        'field is required.')]
+                    if field.blank:
+                        field.validate(field_value)
+                    else:
+                        error_dict[field.attname] = [ValidationError(
+                            'field is required.')]
                 elif not field_empty:
                     field.validate(field_value)
             except Exception as exc:
